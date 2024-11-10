@@ -1,0 +1,2 @@
+frame_nmr,car_id,car_bbox,license_plate_bbox,license_plate_bbox_score,license_number,license_number_score
+0,0,[0 0 0 0],[579.873046875 1020.4910278320312 1410.510498046875 1415.291748046875],0.763658881187439,HRL 98R,0.990427707189359
