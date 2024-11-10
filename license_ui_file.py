@@ -2,7 +2,6 @@ import customtkinter
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from PIL import Image
-from pyzbar.pyzbar import decode
 import cv2
 import numpy as np
 import os
@@ -11,7 +10,6 @@ from util import write_csv
 import easyocr
 import uuid
 from util import *
-import matplotlib.pyplot as plt
 
 folder_path = "./licenses_plates_imgs_detected/"
 LICENSE_MODEL_DETECTION_DIR = './models/license_plate_detector.pt'
