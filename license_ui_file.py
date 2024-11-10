@@ -7,8 +7,7 @@ import cv2
 import numpy as np
 import os
 from ultralytics import YOLO
-from util import set_background, write_csv
-import csv
+from util import write_csv
 import easyocr
 import uuid
 from util import *
@@ -106,54 +105,24 @@ class App(customtkinter.CTk):
             license_numbers = 0
             results = {}
             licenses_texts = []
+            
+            # Importing the image 
             image = cv2.imread(filepath)
+
+            # Resizing the image
             image = cv2.resize(image, (2048, 2048))
 
-            
-            # img = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-            
+            # Converting the image to grayscale
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-            
-            
-            #-----
 
-            # # Histograms Equalization using OpenCV
+            # Histograms Equalization using OpenCV
             equ = cv2.equalizeHist(gray)
 
-            # # Apply sharpening function
+            # Apply sharpening function
             kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
             dst = cv2.filter2D(equ, -1, kernel)
             
-                 
-            
-            # # Apply Fourier Transform
-            #dft = cv2.dft(np.float32(equ), flags=cv2.DFT_COMPLEX_OUTPUT)
-            #dft_shifted = np.fft.fftshift(dft)
-            
-            # # Create a mask for the low-pass filter
-            #rows, cols = dst.shape
-            #crow, ccol = rows // 2, cols // 2
-            #mask = np.zeros((rows, cols, 2), np.uint8)
-            # radius = 90  # Adjust radius for the low-pass filter
-            # cv2.circle(mask, (ccol, crow), radius, (1, 1), -1)
-
-            # # Apply the mask and inverse DFT
-            #filtered_dft = dft_shifted * mask
-            #dft_ishift = np.fft.ifftshift(filtered_dft)
-            #img_back = cv2.idft(dft_ishift)
-            # img_back = cv2.magnitude(img_back[:, :, 0], img_back[:, :, 1])
-            # # Normalize img_back to a 0-255 range and convert to 8-bit
-            #img_back = cv2.normalize(img_back, None, 0, 255, cv2.NORM_MINMAX)
-            #img_back = np.uint8(img_back)
-            
-            #------------
-            
-            
-            
-            # threshold_value, binary_image = cv2.threshold(dst, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-            # print(threshold_value)
-            
-            # # Apply Gaussian blur
+            # Apply Gaussian blur
             blurred = cv2.GaussianBlur(dst, (3, 3), 0)
             sharp_gaussian = cv2.addWeighted(dst, 1.5, blurred, -0.7, 0)
             
@@ -165,23 +134,12 @@ class App(customtkinter.CTk):
             #  # # Mean filtering
             blur = cv2.blur(closed,(3,3))
             
-            # Convert the grayscale image to RGB
+            # Convert the grayscale image back to RGB
             img_back_rgb = cv2.cvtColor(blur, cv2.COLOR_GRAY2RGB)
-            # plt.figure(figsize=(10, 5))
-            # plt.subplot(1, 2, 1)
-            # plt.title('Original Image')
-            # plt.imshow(image, cmap='gray')
-            # plt.subplot(1, 2, 2)
-            # plt.title('Filtered Image')
-            # plt.imshow(img_back_rgb)
-            # plt.show()
+            
+            # YOLO object detection
             object_detections = coco_model(img_back_rgb)[0]
             license_detections = license_plate_detector(img_back_rgb)[0]
-            
-            # _, width, _ = image.shape
-            # if width > 600: 
-            #     image = resize_image(image)
-            
             
             if len(object_detections.boxes.cls.tolist()) != 0 :
                 for detection in object_detections.boxes.data.tolist() :
@@ -232,35 +190,16 @@ class App(customtkinter.CTk):
                 img_wth_box = cv2.cvtColor(img_back_rgb, cv2.COLOR_BGR2RGB)
                 #return [img_wth_box]
                     
-            
-            
-            # barcode_data = None
-            # barcode_type = None
-            # # Detect barcodes in the grayscale image
-            # barcodes = decode(gray)
-            # for barcode in barcodes:
-            #     # Extract barcode data and type
-            #     barcode_data = barcode.data.decode("utf-8")
-            #     barcode_type = barcode.type
-            #     data = (barcode_data, barcode_type)
-            #     barcode_list.append(data)
-
-            #     # Draw a rectangle around the barcode
-            #     (x, y, w, h) = barcode.rect
-            #     cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 255), 5)
-
-            #     # Put barcode data and type on the image
-            #     cv2.putText(image, f"{barcode_data} ({barcode_type})", (x, y - 2), cv2.FONT_HERSHEY_TRIPLEX, 1, (0, 0, 255), 4)
-
             # Save the processed image temporarily for display purposes
-            #image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             image_rgb = img_wth_box
             cv2.imwrite('temp_image.png', image_rgb)
             
-                      
-            if not results[0][0]['license_plate']['text']:
+            if len(results) ==0:
+                messagebox.showwarning("Error", "License plate not detected.")
+            elif not results[0][0]['license_plate']['text']:
                 messagebox.showwarning("Invalid", "Could not read license plate.")
                 return
+            
             
             print('Results:', results)
             
@@ -276,16 +215,6 @@ class App(customtkinter.CTk):
             self.my_label = customtkinter.CTkLabel(self, text="License Plate Number: {0}".format(results[0][0]['license_plate']['text']))
             self.my_label.grid(row=2, column=1, padx=10, pady=15)
                 
-            # else: 
-            #     self.my_label.configure(text="License Plate Number: {0}".format(results[0][0]['license_plate']['text']))
-                             
-            #my_label = customtkinter.CTkLabel(self,text="")
-            #my_label.grid(row=2, column=1, padx=10, pady=15)
-            
-            #my_label = customtkinter.CTkLabel(self,text="License Plate Number: {0}".format(results[0][0]['license_plate']['text']))
-            #my_label = customtkinter.CTkLabel(self, text="Bar code data: {0}\n Bar code type: {1}".format(barcode_data, barcode_type))
-            #my_label.grid(row=2, column=1, padx=10, pady=15)
-            #--------------
             
             my_image = customtkinter.CTkImage(light_image=Image.open('temp_image.png'), dark_image=Image.open('temp_image.png'), size=(450, 400))
                     
@@ -299,13 +228,6 @@ class App(customtkinter.CTk):
                     process_image(filepath)
         else:
             process_image(input_path)
-
-        # # Save barcode_list to a CSV file
-        # with open('barcode_data.csv', mode='w', newline='') as file:
-        #     writer = csv.writer(file)
-        #     writer.writerow(['Barcode Data', 'Barcode Type'])  # Column headers
-        #     writer.writerows(barcode_list)
-        # print("Barcode data has been saved to barcode_data.csv")
 
 
 def read_license_plate(license_plate_crop, img):
