@@ -160,3 +160,5 @@ cython_debug/
 #.idea/
 
 temp_image.png
+output_images/
+csv_detections/

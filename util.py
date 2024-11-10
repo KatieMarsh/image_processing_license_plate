@@ -98,7 +98,7 @@ def read_license_plate(license_plate_crop):
         text = text.upper()
         print(text)
 
-        if text is not None and score is not None and bbox is not None and len(text) >= 6:
+        if text is not None and score is not None and bbox is not None and len(text) >= 4:
         #if license_complies_format(text):
         #    return format_license(text), score
             return text, score

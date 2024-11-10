@@ -107,10 +107,10 @@ class App(customtkinter.CTk):
             licenses_texts = []
             
             # Importing the image 
-            image = cv2.imread(filepath)
+            img = cv2.imread(filepath)
 
             # Resizing the image
-            image = cv2.resize(image, (2048, 2048))
+            image = cv2.resize(img, (2048, 2048))
 
             # Converting the image to grayscale
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -184,6 +184,15 @@ class App(customtkinter.CTk):
                 csv_filename = os.path.join("csv_detections", "detection_results.csv")
                 write_csv(results, csv_filename)
                 img_wth_box = cv2.cvtColor(img_back_rgb, cv2.COLOR_BGR2RGB)
+                cv2.imwrite('./output_images/1_original_image.png', img)
+                cv2.imwrite('./output_images/2_resized_image.png', image)
+                cv2.imwrite('./output_images/3_grayscale_image.png', gray)
+                cv2.imwrite('./output_images/4_HistEqual_image.png', equ)
+                cv2.imwrite('./output_images/5_sharpened_image.png', dst)
+                cv2.imwrite('./output_images/6_gaussian_blur_image.png', sharp_gaussian)
+                cv2.imwrite('./output_images/7_closed_image.png', closed)
+                cv2.imwrite('./output_images/8_mean_filter_image.png', blur)
+                cv2.imwrite('./output_images/9_2rgb_image.png', img_back_rgb)
                 cv2.imwrite('temp_image.png', img_wth_box)
     
             else : 
