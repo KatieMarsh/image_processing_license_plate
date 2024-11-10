@@ -33,8 +33,6 @@ class App(customtkinter.CTk):
         self.input_folder = ""
         self.output_detection_folder = ""
         self.my_label = customtkinter.CTkLabel(self, text = "Hello")
-
-
         self.create_widgets()
 
     def create_widgets(self):
@@ -48,8 +46,6 @@ class App(customtkinter.CTk):
         self.tabview.tab("Image File").grid_columnconfigure(1, weight=0)  # For Browse button
         self.tabview.tab("Image File").grid_columnconfigure(2, weight=0)  # For Run button
         self.tabview.tab("Image File").grid_columnconfigure(3, weight=1)  # Empty column for centering
-
-   
 
         # Input folder selection with label and browse button
         self.filename_entry = customtkinter.CTkEntry(self.tabview.tab("Image File"), width=450)
@@ -74,14 +70,8 @@ class App(customtkinter.CTk):
     def run_detection_file(self):
         self.my_label.destroy()
         self.run_detection(input_type='file')
-        
     
-    
-    
-    def run_detection(self, input_type):
-        barcode_list = []
-        
-
+    def run_detection(self, input_type):      
         if input_type not in ['folder', 'file']:
             raise ValueError("Invalid input type. Must be 'folder' or 'file'.")
 
@@ -95,7 +85,7 @@ class App(customtkinter.CTk):
                 messagebox.showwarning("Input Required", "Please select an input file")
                 return
             if not (self.filename.endswith('.jpg') or self.filename.endswith('.png') or self.filename.endswith('.JPG') or self.filename.endswith('.PNG') or self.filename.endswith('.JPEG') or self.filename.endswith('.jpeg')):
-                messagebox.showwarning("Wrong input", "Please select file ending in '.jpg' or '.png'")
+                messagebox.showwarning("Wrong input", "Please select file ending in '.jpg', 'jpeg' or '.png'")
                 return
             input_path = self.filename
 
@@ -207,16 +197,7 @@ class App(customtkinter.CTk):
                 messagebox.showwarning("Invalid", "Could not read license plate.")
                 return
             
-            
             print('Results:', results)
-            
-
-            # Update the text of the existing label
-            #self.my_label.configure(text="License Plate Number: {0}".format(results[0][0]['license_plate']['text']))
-
-            #-----
-            
-            
             # Create the label for the first time if it doesn't exist
             
             self.my_label = customtkinter.CTkLabel(self, text="License Plate Number: {0}".format(results[0][0]['license_plate']['text']))
