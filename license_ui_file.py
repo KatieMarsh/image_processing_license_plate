@@ -11,6 +11,8 @@ import easyocr
 import uuid
 from util import *
 
+# ========== Loading needed files ==========
+
 folder_path = "./licenses_plates_imgs_detected/"
 LICENSE_MODEL_DETECTION_DIR = './models/license_plate_detector.pt'
 COCO_MODEL_DIR = "./models/yolov8n.pt"
@@ -18,12 +20,13 @@ reader = easyocr.Reader(['en'], gpu=False)
 
 my_label =  ""
 
-
+# ========== Defining variables ==========
 coco_model = YOLO(COCO_MODEL_DIR)
 license_plate_detector = YOLO(LICENSE_MODEL_DETECTION_DIR)
 vehicles = [2]
 threshold = 0.15
 
+# ========== User interface ==========
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
@@ -35,6 +38,7 @@ class App(customtkinter.CTk):
         self.my_label = customtkinter.CTkLabel(self, text = "Hello")
         self.create_widgets()
 
+    # ========== Creating widgets ==========
     def create_widgets(self):
         # create tabview
         self.tabview = customtkinter.CTkTabview(self, width=650, height=200)
@@ -60,6 +64,7 @@ class App(customtkinter.CTk):
         self.button_run = customtkinter.CTkButton(self.tabview.tab("Image File"), text="Run", command=self.run_detection_file, hover_color = "#06402b", fg_color="green")
         self.button_run.grid(row=2, column=2, padx=10, pady=10)
 
+    # ========== Slecting image file ==========
     def selectfile(self):
         self.filename_entry.configure(state="normal")
         self.filename = filedialog.askopenfilename()
@@ -67,10 +72,12 @@ class App(customtkinter.CTk):
         self.filename_entry.insert(0, self.filename)
         self.filename_entry.configure(state="readonly")
 
+    # ========== Run detection function ==========
     def run_detection_file(self):
         self.my_label.destroy()
         self.run_detection(input_type='file')
     
+    # ========== Detection function ==========
     def run_detection(self, input_type):      
         if input_type not in ['folder', 'file']:
             raise ValueError("Invalid input type. Must be 'folder' or 'file'.")
@@ -89,6 +96,7 @@ class App(customtkinter.CTk):
                 return
             input_path = self.filename
 
+        # ========== Applying image processing and object detection ==========
         def process_image(filepath):
             license_numbers = 0
             results = {}
@@ -217,7 +225,7 @@ class App(customtkinter.CTk):
         else:
             process_image(input_path)
 
-
+# ========== License plate reading ==========
 def read_license_plate(license_plate_crop, img):
     scores = 0
     detections = reader.readtext(license_plate_crop)
